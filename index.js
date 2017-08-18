@@ -1,6 +1,6 @@
 'use strict'
 
-var uuid = require('uuid')
+var nanoid = require('nanoid')
 var htmlparser = require('htmlparser2')
 var indentString = require('indent-string')
 
@@ -57,8 +57,8 @@ function writeln (command, tag, key, spvp, pvp) {
       str += ', ' + key
     } else if (spvp && spvp.length) {
       str += ', ' + (isIterator
-        ? strify(uuid.v4() + '_') + ' + $key'
-        : strify(uuid.v4()))
+        ? strify(nanoid() + '_') + ' + $key'
+        : strify(nanoid()))
     } else {
       str += ', null'
     }
@@ -199,10 +199,10 @@ var handler = {
       var idxIn = eachProp.indexOf(' in')
 
       if (~idxComma && idxComma < idxIn) {
-        key = strify(uuid.v4() + '_') + ' + ' + eachProp.substring(idxComma + 2, idxIn)
+        key = strify(nanoid() + '_') + ' + ' + eachProp.substring(idxComma + 2, idxIn)
         eachProp = eachProp.substring(0, idxComma) + eachProp.substr(idxIn)
       } else {
-        key = strify(uuid.v4() + '_') + ' + $item'
+        key = strify(nanoid() + '_') + ' + $item'
       }
 
       var eachAttr = eachProp
