@@ -10,6 +10,7 @@ var indent = 0
 var hoisted = 0
 var endBraces = {}
 var literal = false
+var hoistedLiteral = false
 var meta = null
 var childIndexes = {}
 var tagLevel = 0
@@ -29,6 +30,7 @@ function flush () {
   hoisted = 0
   endBraces = {}
   literal = false
+  hoistedLiteral = false
   meta = null
   childIndexes = {}
   tagLevel = 0
@@ -185,6 +187,7 @@ var handler = {
     }
     if (name === 'script' && !attribs['type']) {
       literal = true
+      hoistedLiteral = typeof attribs['hoisted'] !== 'undefined'
       return
     }
     if (name === 'if') {
@@ -259,7 +262,11 @@ var handler = {
     }
 
     if (literal) {
-      write(text.trim())
+      if (hoistedLiteral) {
+        hoist.push(text.trim())
+      } else {
+        write(text.trim())
+      }
     } else {
       write('text(' + interpolate(text) + ')')
     }

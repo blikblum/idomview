@@ -190,4 +190,31 @@ if (__target) {
       expect(output).toEqual(addWrapper(expected))
     })
   })
+
+  describe('with script element', function () {
+    it('should output the raw content', function () {
+      var expected = (
+        `var __target
+
+return function description (data) {
+var test = getData()
+}`)
+      var output = superviews('<script>var test = getData()</script>')
+      expect(output).toEqual(addWrapper(expected))
+    })
+
+    describe('with hoisted attribute', function () {
+      it('should hoist the raw content', function () {
+        var expected = (
+          `var test = require("test")
+var __target
+
+return function description (data) {
+
+}`)
+        var output = superviews('<script hoisted>var test = require("test")</script>')
+        expect(output).toEqual(addWrapper(expected))
+      })
+    })
+  })
 })
