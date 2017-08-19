@@ -121,6 +121,8 @@ if (__target) {
     var item = $value
     var $key = "xxxx-xxxx_" + $item
     elementOpen("li", $key + "1")
+      elementOpen("div")
+      elementClose("div")
     elementClose("li")
     elementOpen("li", $key + "2")
     elementClose("li")
@@ -128,7 +130,7 @@ if (__target) {
 }
 }`)
       var output = superviews(`<each condition="item in array">
-  <li></li>
+  <li><div></div></li>
   <li></li>
 </each>`)
       expect(output).toEqual(addWrapper(expected))
@@ -145,6 +147,8 @@ if (__target) {
     var item = $value
     var $key = "xxxx-xxxx_" + item.id
     elementOpen("li", $key + "1")
+      elementOpen("div")
+      elementClose("div")
     elementClose("li")
     elementOpen("li", $key + "2")
     elementClose("li")
@@ -152,7 +156,35 @@ if (__target) {
 }
 }`)
       var output = superviews(`<each condition="item, item.id in array">
+  <li><div></div></li>
   <li></li>
+</each>`)
+      expect(output).toEqual(addWrapper(expected))
+    })
+
+    it('should allow to nest if expression', function () {
+      var expected = (
+        `var __target
+
+return function description (data) {
+__target = array
+if (__target) {
+  ;(__target.forEach ? __target : Object.keys(__target)).forEach(function($value, $item, $target) {
+    var item = $value
+    var $key = "xxxx-xxxx_" + $item
+    if (test) {
+      elementOpen("li", $key + "1")
+        elementOpen("div")
+        elementClose("div")
+      elementClose("li")
+    }
+    elementOpen("li", $key + "2")
+    elementClose("li")
+  }, this)
+}
+}`)
+      var output = superviews(`<each condition="item in array">
+  <li if="test"><div></div></li>
   <li></li>
 </each>`)
       expect(output).toEqual(addWrapper(expected))

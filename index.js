@@ -11,6 +11,8 @@ var hoisted = 0
 var endBraces = {}
 var literal = false
 var meta = null
+var childIndexes = {}
+var tagLevel = 0
 
 var specialTags = {
   each: 'each',
@@ -28,6 +30,8 @@ function flush () {
   endBraces = {}
   literal = false
   meta = null
+  childIndexes = {}
+  tagLevel = 0
 }
 
 function isInIterator () {
@@ -170,6 +174,7 @@ function writeEach (name, eachProp, saveEndBraces) {
 
 var handler = {
   onopentag: function (name, attribs) {
+    tagLevel++
     if (!indent && (name === 'template') && 'args' in attribs) {
       meta = {
         name: attribs['name'],
@@ -201,6 +206,7 @@ var handler = {
     }
 
     if (name === 'each') {
+      childIndexes['each' + tagLevel] = 1
       writeEach(name, attribs['condition'] || '')
       return
     }
@@ -230,6 +236,14 @@ var handler = {
       key = '$key'
     }
 
+    if (!key) {
+      var keyIndex = childIndexes['each' + (tagLevel - 1)]
+      if (typeof keyIndex !== 'undefined') {
+        key = '$key + "' + keyIndex + '"'
+        childIndexes['each' + (tagLevel - 1)] = keyIndex + 1
+      }
+    }
+
     writeln('elementOpen', name, key, attrs.statics, attrs.properties)
     ++indent
 
@@ -251,6 +265,7 @@ var handler = {
     }
   },
   onclosetag: function (name) {
+    tagLevel--
     if ((indent === 1 && meta && name === 'template')) {
       return
     }
@@ -271,6 +286,7 @@ var handler = {
     }
 
     if (name === 'each') {
+      delete childIndexes['each' + (tagLevel + 1)]
       --indent
       write('}, this)')
       --indent
