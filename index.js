@@ -142,6 +142,32 @@ function getAttrs (name, attribs, nostatics) {
   }
 }
 
+function writeEach (name, eachProp, saveEndBraces) {
+  var key
+  var idxComma = eachProp.indexOf(',')
+  var idxIn = eachProp.indexOf(' in')
+
+  if (~idxComma && idxComma < idxIn) {
+    key = strify(nanoid() + '_') + ' + ' + eachProp.substring(idxComma + 2, idxIn)
+    eachProp = eachProp.substring(0, idxComma) + eachProp.substr(idxIn)
+  } else {
+    key = strify(nanoid() + '_') + ' + $item'
+  }
+
+  var eachParts = eachProp.split(' in ')
+  var target = eachParts[1]
+  write('__target = ' + target)
+  write('if (__target) {')
+  ++indent
+  if (saveEndBraces) {
+    endBraces[name + '_each_' + indent] = '}, this)'
+  }
+  write(';(__target.forEach ? __target : Object.keys(__target)).forEach(function($value, $item, $target) {')
+  ++indent
+  write('var ' + eachParts[0] + ' = $value')
+  write('var $key = ' + key)
+}
+
 var handler = {
   onopentag: function (name, attribs) {
     if (!indent && (name === 'template') && 'args' in attribs) {
@@ -174,6 +200,11 @@ var handler = {
       return
     }
 
+    if (name === 'each') {
+      writeEach(name, attribs['condition'] || '')
+      return
+    }
+
     var key = attribs['key']
     var nostatics
     if (typeof key !== 'undefined') {
@@ -195,27 +226,7 @@ var handler = {
     }
 
     if (specials.each) {
-      var eachProp = specials.each
-      var idxComma = eachProp.indexOf(',')
-      var idxIn = eachProp.indexOf(' in')
-
-      if (~idxComma && idxComma < idxIn) {
-        key = strify(nanoid() + '_') + ' + ' + eachProp.substring(idxComma + 2, idxIn)
-        eachProp = eachProp.substring(0, idxComma) + eachProp.substr(idxIn)
-      } else {
-        key = strify(nanoid() + '_') + ' + $item'
-      }
-
-      var eachParts = eachProp.split(' in ')
-      var target = eachParts[1]
-      write('__target = ' + target)
-      write('if (__target) {')
-      ++indent
-      endBraces[name + '_each_' + indent] = '}, this)'
-      write(';(__target.forEach ? __target : Object.keys(__target)).forEach(function($value, $item, $target) {')
-      ++indent
-      write('var ' + eachParts[0] + ' = $value')
-      write('var $key = ' + key)
+      writeEach(name, specials.each, true)
       key = '$key'
     }
 
@@ -254,6 +265,14 @@ var handler = {
     }
 
     if (name === 'if') {
+      --indent
+      write('}')
+      return
+    }
+
+    if (name === 'each') {
+      --indent
+      write('}, this)')
       --indent
       write('}')
       return
