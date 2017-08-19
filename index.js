@@ -174,7 +174,8 @@ var handler = {
       return
     }
 
-    var key = attribs['key'], nostatics
+    var key = attribs['key']
+    var nostatics
     if (typeof key !== 'undefined') {
       if (key === '') {
         nostatics = true
@@ -205,8 +206,7 @@ var handler = {
         key = strify(nanoid() + '_') + ' + $item'
       }
 
-      var eachAttr = eachProp
-      var eachParts = eachAttr.split(' in ')
+      var eachParts = eachProp.split(' in ')
       var target = eachParts[1]
       write('__target = ' + target)
       write('if (__target) {')
@@ -259,6 +259,8 @@ var handler = {
       return
     }
 
+    var endBraceKey, end
+
     // Check end `skip` braces
     endBraceKey = name + '_skip_' + (indent - 1)
     if (endBraces[endBraceKey]) {
@@ -272,7 +274,6 @@ var handler = {
     writeln('elementClose', name)
 
     // Check end `each` braces
-    var endBraceKey, end
 
     endBraceKey = name + '_each_' + (indent - 1)
     if (endBraces[endBraceKey]) {
