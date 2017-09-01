@@ -198,13 +198,13 @@ var handler = {
       return
     }
     if (name === 'if') {
-      write('if (' + (attribs['condition'] || 'true') + ') {')
+      write('if (' + (attribs['condition'] || attribs['expression'] || 'true') + ') {')
       ++indent
       return
     }
     if (name === 'elseif') {
       --indent
-      write('} else if (' + (attribs['condition'] || 'true') + ') {')
+      write('} else if (' + (attribs['condition'] || attribs['expression'] || 'true') + ') {')
       ++indent
       return
     }
@@ -217,7 +217,7 @@ var handler = {
 
     if (name === 'each') {
       childIndexes['each' + tagLevel] = 1
-      writeEach(name, attribs['condition'] || '')
+      writeEach(name, attribs['expression'] || '')
       return
     }
 

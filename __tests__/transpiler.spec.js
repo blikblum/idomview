@@ -155,7 +155,7 @@ if (__target) {
   }, this)
 }
 }`)
-      var output = superviews(`<each condition="item in array">
+      var output = superviews(`<each expression="item in array">
   <li><div></div></li>
   <li></li>
 </each>`)
@@ -181,7 +181,7 @@ if (__target) {
   }, this)
 }
 }`)
-      var output = superviews(`<each condition="item, item.id in array">
+      var output = superviews(`<each expression="item, item.id in array">
   <li><div></div></li>
   <li></li>
 </each>`)
@@ -209,7 +209,7 @@ if (__target) {
   }, this)
 }
 }`)
-      var output = superviews(`<each condition="item in array">
+      var output = superviews(`<each expression="item in array">
   <li if="test"><div></div></li>
   <li></li>
 </each>`)
