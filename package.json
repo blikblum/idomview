@@ -1,6 +1,6 @@
 {
   "name": "idomview",
-  "version": "3.1.0",
+  "version": "3.3.0",
   "description": "Template engine compiler targeting incremental-dom",
   "main": "index.js",
   "browser": "index.js",
@@ -31,8 +31,7 @@
     "indent-string": "3.0.0",
     "is-my-json-valid": "2.15.0",
     "minimist": "1.2.0",
-    "nanoid": "^0.2.0",
-    "uuid": "2.0.3"
+    "nanoid": "^0.2.0"
   },
   "devDependencies": {
     "brace": "0.9.0",
