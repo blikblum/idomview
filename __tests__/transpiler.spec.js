@@ -20,8 +20,8 @@ elementClose("div")
 
     it('should transpile simple element with attributes', function () {
       var expected = (
-`var hoisted1 = ["class", "header", "id", "title"]
-var __target
+`var __target
+var hoisted1 = ["class", "header", "id", "title"]
 
 return function description (data) {
 elementOpen("h1", "xxxx-xxxx", hoisted1)
@@ -29,6 +29,32 @@ elementClose("h1")
 }`)
 
       var output = superviews('<h1 class="header" id="title"></h1>')
+      expect(output).toEqual(addWrapper(expected))
+    })
+
+    it('should reuse hoisted variables with same attributes', function () {
+      var expected = (
+        `var __target
+var hoisted1 = ["class", "header", "id", "title"]
+var hoisted2 = ["class", "header"]
+var hoisted3 = ["class", "header", "id", "nav"]
+
+return function description (data) {
+elementOpen("h1", "xxxx-xxxx", hoisted1)
+elementClose("h1")
+elementOpen("h1", "xxxx-xxxx", hoisted1)
+elementClose("h1")
+elementOpen("h1", "xxxx-xxxx", hoisted2)
+elementClose("h1")
+elementOpen("h1", "xxxx-xxxx", hoisted3)
+elementClose("h1")
+}`)
+
+      var output = superviews(`<h1 class="header" id="title"></h1>
+<h1 id="title" class="header"></h1>
+<h1 class="header"></h1>
+<h1 class="header" id="nav"></h1>
+`)
       expect(output).toEqual(addWrapper(expected))
     })
 

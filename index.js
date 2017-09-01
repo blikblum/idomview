@@ -3,11 +3,10 @@
 var nanoid = require('nanoid')
 var htmlparser = require('htmlparser2')
 var indentString = require('indent-string')
+var hoist = require('./hoistBuilder')
 
 var buffer = []
-var hoist = []
 var indent = 0
-var hoisted = 0
 var endBraces = {}
 var literal = false
 var hoistedLiteral = false
@@ -25,9 +24,8 @@ var specialTags = {
 
 function flush () {
   buffer.length = 0
-  hoist.length = 0
+  hoist.clear()
   indent = 0
-  hoisted = 0
   endBraces = {}
   literal = false
   hoistedLiteral = false
@@ -70,13 +68,12 @@ function writeln (command, tag, key, spvp, pvp) {
     }
 
     if (spvp && spvp.length) {
-      var statics = '[' + spvp.map(function (item, index) {
-        return strify(item)
+      var statics = '[' + spvp.map(function (item) {
+        return strify(item.name) + ', ' + strify(item.value)
       }).join(', ') + ']'
 
-      ++hoisted
-      hoist.push(('var hoisted' + hoisted) + ' = ' + statics)
-      str += ', hoisted' + hoisted
+      var varName = hoist.addStatics(statics)
+      str += ', ' + varName
     } else {
       str += ', null'
     }
@@ -136,11 +133,21 @@ function getAttrs (name, attribs, nostatics) {
         properties.push(key)
         properties.push(strify(attrib))
       } else {
-        statics.push(key)
-        statics.push(attrib)
+        statics.push({name: key, value: attrib})
       }
     }
   }
+  // sort by attribute name
+  statics.sort(function (attrib1, attrib2) {
+    if (attrib1.name === attrib2.name) {
+      return 0
+    } else if (attrib1.name < attrib2.name) {
+      return -1
+    } else {
+      return 1
+    }
+  })
+
   return {
     specials: specials,
     statics: statics,
@@ -263,7 +270,7 @@ var handler = {
 
     if (literal) {
       if (hoistedLiteral) {
-        hoist.push(text.trim())
+        hoist.addLiteral(text.trim())
       } else {
         write(text.trim())
       }
@@ -359,8 +366,8 @@ module.exports = function (tmplstr, name, argstr, mode) {
     return item.trim()
   }).join(', ')
 
-  hoist.push(('var __target'))
-  var hoisted = hoist.join('\n')
+  hoist.addLiteral(('var __target'))
+  var hoisted = hoist.build()
   var fn = 'function ' + name + ' (' + args + ') {\n' + result + '\n}'
 
   switch (mode) {
