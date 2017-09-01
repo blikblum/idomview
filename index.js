@@ -242,7 +242,7 @@ var handler = {
     if (!key) {
       var keyIndex = childIndexes['each' + (tagLevel - 1)]
       if (typeof keyIndex !== 'undefined') {
-        key = '$key + "' + keyIndex + '"'
+        key = '$key + "_' + keyIndex + '"'
         childIndexes['each' + (tagLevel - 1)] = keyIndex + 1
       }
     }

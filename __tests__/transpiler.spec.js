@@ -120,11 +120,11 @@ if (__target) {
   ;(__target.forEach ? __target : Object.keys(__target)).forEach(function($value, $item, $target) {
     var item = $value
     var $key = "xxxx-xxxx_" + $item
-    elementOpen("li", $key + "1")
+    elementOpen("li", $key + "_1")
       elementOpen("div")
       elementClose("div")
     elementClose("li")
-    elementOpen("li", $key + "2")
+    elementOpen("li", $key + "_2")
     elementClose("li")
   }, this)
 }
@@ -146,11 +146,11 @@ if (__target) {
   ;(__target.forEach ? __target : Object.keys(__target)).forEach(function($value, $item, $target) {
     var item = $value
     var $key = "xxxx-xxxx_" + item.id
-    elementOpen("li", $key + "1")
+    elementOpen("li", $key + "_1")
       elementOpen("div")
       elementClose("div")
     elementClose("li")
-    elementOpen("li", $key + "2")
+    elementOpen("li", $key + "_2")
     elementClose("li")
   }, this)
 }
@@ -173,12 +173,12 @@ if (__target) {
     var item = $value
     var $key = "xxxx-xxxx_" + $item
     if (test) {
-      elementOpen("li", $key + "1")
+      elementOpen("li", $key + "_1")
         elementOpen("div")
         elementClose("div")
       elementClose("li")
     }
-    elementOpen("li", $key + "2")
+    elementOpen("li", $key + "_2")
     elementClose("li")
   }, this)
 }
