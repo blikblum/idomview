@@ -34,12 +34,6 @@ function flush () {
   tagLevel = 0
 }
 
-function isInIterator () {
-  return !!Object.keys(endBraces).find(function (item) {
-    return item.match('_each_')
-  })
-}
-
 function strify (str) {
   return '"' + (str || '') + '"'
 }
@@ -52,7 +46,6 @@ function write (line) {
 
 function writeln (command, tag, key, spvp, pvp) {
   var str = command
-  var isIterator = isInIterator()
 
   str += '(' + strify(tag)
 
@@ -60,9 +53,7 @@ function writeln (command, tag, key, spvp, pvp) {
     if (key) {
       str += ', ' + key
     } else if (spvp && spvp.length) {
-      str += ', ' + (isIterator
-        ? strify(nanoid() + '_') + ' + $key'
-        : strify(nanoid()))
+      str += ', ' + strify(nanoid())
     } else {
       str += ', null'
     }
