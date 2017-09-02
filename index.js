@@ -91,7 +91,7 @@ function interpolate (text) {
   return strify(text)
 }
 
-function getAttrs (name, attribs, nostatics) {
+function getAttrs (attribs, nostatics) {
   var specials = {}
   var statics = []
   var properties = []
@@ -230,7 +230,7 @@ var handler = {
       delete attribs['key']
     }
 
-    var attrs = getAttrs(name, attribs, nostatics)
+    var attrs = getAttrs(attribs, nostatics)
     var specials = attrs.specials
 
     if (specials.if) {
