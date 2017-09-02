@@ -11,7 +11,7 @@ var endBraces = {}
 var literal = false
 var hoistedLiteral = false
 var meta = null
-var childIndexes = {}
+var treeContext = {}
 var tagLevel = 0
 
 var specialTags = {
@@ -30,7 +30,7 @@ function flush () {
   literal = false
   hoistedLiteral = false
   meta = null
-  childIndexes = {}
+  treeContext = {}
   tagLevel = 0
 }
 
@@ -155,16 +155,20 @@ function getAttrs (name, attribs, nostatics) {
   }
 }
 
-function writeEach (name, eachProp, saveEndBraces) {
-  var key
+function writeEach (name, eachProp, isElement) {
+  var key = strify(nanoid() + '_')
   var idxComma = eachProp.indexOf(',')
   var idxIn = eachProp.indexOf(' in')
 
+  if (typeof treeContext['each' + (tagLevel - 1)] !== 'undefined') {
+    key += ' + __iterationKey' + (tagLevel - 1)
+  }
+
   if (~idxComma && idxComma < idxIn) {
-    key = strify(nanoid() + '_') + ' + ' + eachProp.substring(idxComma + 2, idxIn)
+    key += ' + ' + eachProp.substring(idxComma + 2, idxIn)
     eachProp = eachProp.substring(0, idxComma) + eachProp.substr(idxIn)
   } else {
-    key = strify(nanoid() + '_') + ' + $item'
+    key += ' + $item'
   }
 
   var eachParts = eachProp.split(' in ')
@@ -172,11 +176,14 @@ function writeEach (name, eachProp, saveEndBraces) {
   write('__target = ' + target)
   write('if (__target) {')
   ++indent
-  if (saveEndBraces) {
+  if (!isElement) {
     endBraces[name + '_each_' + indent] = '}, this)'
   }
   write(';(__target.forEach ? __target : Object.keys(__target)).forEach(function($value, $item, $target) {')
   ++indent
+  if (isElement) {
+    write('var __iterationKey' + tagLevel + ' = $item + "_"')
+  }
   write('var ' + eachParts[0] + ' = $value')
   write('var $key = ' + key)
 }
@@ -216,8 +223,8 @@ var handler = {
     }
 
     if (name === 'each') {
-      childIndexes['each' + tagLevel] = 1
-      writeEach(name, attribs['expression'] || '')
+      treeContext['each' + tagLevel] = 1
+      writeEach(name, attribs['expression'] || '', true)
       return
     }
 
@@ -242,15 +249,15 @@ var handler = {
     }
 
     if (specials.each) {
-      writeEach(name, specials.each, true)
+      writeEach(name, specials.each, false)
       key = '$key'
     }
 
     if (!key) {
-      var keyIndex = childIndexes['each' + (tagLevel - 1)]
+      var keyIndex = treeContext['each' + (tagLevel - 1)]
       if (typeof keyIndex !== 'undefined') {
         key = '$key + "_' + keyIndex + '"'
-        childIndexes['each' + (tagLevel - 1)] = keyIndex + 1
+        treeContext['each' + (tagLevel - 1)] = keyIndex + 1
       }
     }
 
@@ -300,7 +307,7 @@ var handler = {
     }
 
     if (name === 'each') {
-      delete childIndexes['each' + (tagLevel + 1)]
+      delete treeContext['each' + (tagLevel + 1)]
       --indent
       write('}, this)')
       --indent

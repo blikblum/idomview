@@ -144,6 +144,7 @@ return function description (data) {
 __target = array
 if (__target) {
   ;(__target.forEach ? __target : Object.keys(__target)).forEach(function($value, $item, $target) {
+    var __iterationKey1 = $item + "_"
     var item = $value
     var $key = "xxxx-xxxx_" + $item
     elementOpen("li", $key + "_1")
@@ -170,6 +171,7 @@ return function description (data) {
 __target = array
 if (__target) {
   ;(__target.forEach ? __target : Object.keys(__target)).forEach(function($value, $item, $target) {
+    var __iterationKey1 = $item + "_"
     var item = $value
     var $key = "xxxx-xxxx_" + item.id
     elementOpen("li", $key + "_1")
@@ -196,6 +198,7 @@ return function description (data) {
 __target = array
 if (__target) {
   ;(__target.forEach ? __target : Object.keys(__target)).forEach(function($value, $item, $target) {
+    var __iterationKey1 = $item + "_"
     var item = $value
     var $key = "xxxx-xxxx_" + $item
     if (test) {
@@ -211,6 +214,40 @@ if (__target) {
 }`)
       var output = superviews(`<each expression="item in array">
   <li if="test"><div></div></li>
+  <li></li>
+</each>`)
+      expect(output).toEqual(addWrapper(expected))
+    })
+
+    it('should allow to nest each expression', function () {
+      var expected = (
+        `var __target
+
+return function description (data) {
+__target = array
+if (__target) {
+  ;(__target.forEach ? __target : Object.keys(__target)).forEach(function($value, $item, $target) {
+    var __iterationKey1 = $item + "_"
+    var item = $value
+    var $key = "xxxx-xxxx_" + $item
+    __target = item
+    if (__target) {
+      ;(__target.forEach ? __target : Object.keys(__target)).forEach(function($value, $item, $target) {
+        var prop = $value
+        var $key = "xxxx-xxxx_" + __iterationKey1 + $item
+        elementOpen("li", $key)
+          elementOpen("div")
+          elementClose("div")
+        elementClose("li")
+      }, this)
+    }
+    elementOpen("li", $key + "_1")
+    elementClose("li")
+  }, this)
+}
+}`)
+      var output = superviews(`<each expression="item in array">
+  <li each="prop in item"><div></div></li>
   <li></li>
 </each>`)
       expect(output).toEqual(addWrapper(expected))
