@@ -1,6 +1,6 @@
 {
   "name": "idomview",
-  "version": "3.3.0",
+  "version": "3.3.1",
   "description": "Template engine compiler targeting incremental-dom",
   "main": "index.js",
   "browser": "index.js",
@@ -41,7 +41,7 @@
     "superviewify": "3.0.0"
   },
   "bugs": {
-    "url": "https://github.com/davidjamesstone/superviews.js/issues"
+    "url": "https://github.com/blikblum/idomview/issues"
   },
-  "homepage": "https://github.com/davidjamesstone/superviews.js#readme"
+  "homepage": "https://github.com/blikblum/idomview"
 }
